@@ -1,0 +1,24 @@
+{
+    "name": "unyii2/yii2-panel",
+    "minimum-stability": "dev",
+    "prefer-stable": "true",
+    "description": "yii2 panel module",
+    "keywords": ["yii2",  "panel"],
+    "homepage": "https://github.com/unyii2/yii2-panel.git",
+    "license": "BSD-4-Clause",
+    "authors": [
+        {
+            "name": "Uldis Nelsons",
+            "email": "uldis@weberp.lv",
+            "homepage": "http://www.weberp.lv/"
+        }
+    ],
+    "require": {
+        "php": ">=7.*"
+    },
+    "autoload": {
+        "psr-4": {
+            "unyii2\\yii2-panel\\": "src/"
+        }
+    }
+}

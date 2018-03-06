@@ -5,6 +5,7 @@ namespace unyii2\yii2panel;
 
 
 use yii\base\Widget;
+use yii\web\ForbiddenHttpException;
 
 class PanelWidget extends Widget
 {
@@ -13,26 +14,36 @@ class PanelWidget extends Widget
 
     public $params = [];
 
-    private $panelController;
+    private $panelControllers;
 
     public function init()
     {
         parent::init();
-        $this->panelControllers = Yii::$app->controller->module->panels[$this->name];
+        $this->panelControllers = \Yii::$app->controller->module->panels[$this->name];
     }
 
 
+    /**
+     * @return string
+     * @throws \Exception
+     */
     public function run()
     {
         $result = '';
         foreach ($this->panelControllers as $panelController) {
-            $controller = \Yii::createObject($panelController['class']);
-            $action = $panelController['action'];
+            $route = $panelController['route'];
+
             $configParams = $panelController['params'] ?? [];
             foreach ($this->params as $paramName => $paramValue) {
                 $configParams[$paramName] = $paramValue;
             }
-            $result .= $controller->runAction($action, $configParams);
+            try {
+                $result .= \Yii::$app->runAction($route, $configParams);
+            }catch (ForbiddenHttpException $e ){
+                //its ok - no access
+            }catch (\Exception $exception){
+                throw $exception;
+            }
         }
 
         return $result;

@@ -12,4 +12,10 @@ class Controller extends \yii\base\Controller
     {
         return $this->getView()->render($view, $params, $this);
     }
+
+//    public function getViewPath()
+//    {
+//        return $this->module->getViewPath();// . DIRECTORY_SEPARATOR . $this->id;
+//
+//    }
 }

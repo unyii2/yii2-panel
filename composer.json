@@ -18,7 +18,7 @@
     },
     "autoload": {
         "psr-4": {
-            "unyii2\\yii2-panel\\": "src/"
+            "unyii2\\yii2panel\\": "src/"
         }
     }
 }

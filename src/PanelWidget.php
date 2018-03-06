@@ -11,7 +11,6 @@ class PanelWidget extends Widget
 
     public $name;
 
-    public $action;
     public $params = [];
 
     private $panelController;
@@ -26,17 +25,14 @@ class PanelWidget extends Widget
     public function run()
     {
         $result = '';
-        foreach ($this->panelControllers as $panelController){
-            if(!is_array($panelController)){
-                $panelController['class'] = $panelController;
-            }
-
+        foreach ($this->panelControllers as $panelController) {
             $controller = \Yii::createObject($panelController['class']);
-            unset($panelController['class']);
-            foreach($this->params as $paramName => $paramValue){
-                $panelController[$paramName] = $paramValue;
+            $action = $panelController['action'];
+            $configParams = $panelController['params'] ?? [];
+            foreach ($this->params as $paramName => $paramValue) {
+                $configParams[$paramName] = $paramValue;
             }
-            $result .= $controller->runAction($this->action, $panelController);
+            $result .= $controller->runAction($action, $configParams);
         }
 
         return $result;

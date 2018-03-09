@@ -4,7 +4,7 @@
 namespace unyii2\yii2panel;
 
 
-class Controller extends \yii\base\Controller
+class Controller extends \yii\web\Controller
 {
     public $params = [];
 

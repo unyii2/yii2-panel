@@ -3,6 +3,10 @@ yii2 panel controller
 
 [![Total Downloads](https://img.shields.io/packagist/dt/unyii2/yii2-panel.svg?style=flat-square)](https://packagist.org/packages/unyii2/yii2-panel) 
 
+Simply dashboard solution. Each dashboard panel define in controller identicaly as Yii page:
+* in behaviors can control access - panel display only for users, who has access
+* create action. Can use parameters also 
+* create view folder in same folder, where all other controller views
 
 
 Installation by composer

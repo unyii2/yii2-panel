@@ -14,12 +14,12 @@ class PanelWidget extends Widget
 
     public $params = [];
 
-    private $panelControllers;
+    private $panelControllers = [];
 
     public function init()
     {
         parent::init();
-        $this->panelControllers = \Yii::$app->controller->module->panels[$this->name];
+        $this->panelControllers = \Yii::$app->controller->module->panels[$this->name]??[];
     }
 
 

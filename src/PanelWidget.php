@@ -19,7 +19,9 @@ class PanelWidget extends Widget
     public function init()
     {
         parent::init();
-        $this->panelControllers = \Yii::$app->controller->module->panels[$this->name];
+        if(isset(\Yii::$app->controller->module->panels[$this->name])) {
+            $this->panelControllers = \Yii::$app->controller->module->panels[$this->name];
+        }
     }
 
 
@@ -29,6 +31,10 @@ class PanelWidget extends Widget
      */
     public function run()
     {
+
+        if(!$this->panelControllers){
+            return '';
+        }
         $result = '';
         foreach ($this->panelControllers as $panelController) {
             $route = $panelController['route'];

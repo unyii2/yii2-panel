@@ -29,6 +29,10 @@ class PanelWidget extends Widget
      */
     public function run()
     {
+
+        if(!$this->panelControllers){
+            return '';
+        }
         $result = '';
         foreach ($this->panelControllers as $panelController) {
             $route = $panelController['route'];

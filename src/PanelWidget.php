@@ -19,7 +19,9 @@ class PanelWidget extends Widget
     public function init()
     {
         parent::init();
-        $this->panelControllers = \Yii::$app->controller->module->panels[$this->name]??[];
+        $this->panelControllers = \Yii::$app->controller->module->panels[$this->name]
+            ?? \Yii::$app->params['panelWidget'][\Yii::$app->controller->module->id][$this->name]
+            ?? [];
     }
 
 

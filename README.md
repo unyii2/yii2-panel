@@ -58,6 +58,7 @@ echo \unyii2\yii2panel\PanelWidget::widget([
 
 # Module config
 
+To module add parameter 'panels' and in configuration for module add panels routes
 ```php
         'invoices' => [
             'class' => 'd3modules\d3invoices\Module',
@@ -75,6 +76,23 @@ echo \unyii2\yii2panel\PanelWidget::widget([
         ],
 
 ```
+
+Optionally, if no possible add to module parameter 'panels', panel routes can define in parameters
+
+```php
+'params' => [
+    'panelWidget' => [
+        'dashboard' => [
+            'last' =>  [
+                [
+                    'route' => 'delivery/panel/transit-declarations',
+                ]
+            ],
+        ]
+    ],
+]
+
+``` 
 
 # Panel controller with access control and view rendering
 

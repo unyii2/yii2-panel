@@ -118,6 +118,9 @@ class InvoicePanelController extends Controller
             'access' => [
                 'class' => AccessControl::class,
                 'rules' => [
+                    /**
+                    * standard definition
+                    */
                     [
                         'allow' => true,
                         'actions' => [
@@ -127,6 +130,26 @@ class InvoicePanelController extends Controller
                             'DocSetting',
                         ],
                     ],
+                    
+                    /**
+                    * roles define in panel module config. 
+                    *   Example of edi module config:
+                    *        'edi' => [
+                    *            'class' => 'd3yii2\d3edi\Module',
+                    *            'accessRulesMessageRoles' => ['Depo3EdiFull']
+                    *        ],
+                    *   In Module add property:
+                    *        class Module extends D3Module
+                    *           public $accessRulesMessageRoles;
+                    *           ....
+                    */
+                    [
+                        'allow' => true,
+                        'actions' => [
+                            'message',
+                        ],
+                        'roles' => $this->module->rulesMessageRoles??['@'],
+                    ],                    
                 ],
             ],
         ];
@@ -135,6 +158,12 @@ class InvoicePanelController extends Controller
     public function actionDocumentSettings()
     {
         return $this->render('setting_grid',[]);
+
+    }
+
+    public function actionMessage()
+    {
+        return $this->render('message',[]);
 
     }
 

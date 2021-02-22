@@ -76,7 +76,24 @@ To module add parameter 'panels' and in configuration for module add panels rout
         ],
 
 ```
-
+To controller add parameter 'panels' and in configuration for module add panels routes
+```php
+        'invoices' => [
+            'class' => 'd3modules\d3invoices\Module',
+            'controllerMap' => [
+                'settings' => [
+                    'class' => 'yii3\persons\controllers\SettingsController',
+                    'panels' => [
+                        'UserSettingsProvileLeft' =>
+                            [
+                                [
+                                    'route' => 'myauth/panel/show-qrc'
+                                 ]
+                            ]
+                    ]
+                ],
+            ],
+```
 Optionally, if no possible add to module parameter 'panels', panel routes can define in parameters
 
 ```php

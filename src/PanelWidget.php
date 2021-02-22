@@ -22,13 +22,20 @@ class PanelWidget extends Widget
     {
         parent::init();
 
-        if(Yii::$app->controller->module->panels[$this->name]??false){
-            foreach (Yii::$app->controller->module->panels[$this->name] as $controller){
+        $leadingController = Yii::$app->controller;
+        if(isset($leadingController->panels) && $leadingController->panels[$this->name]??false){
+            foreach ($leadingController->panels[$this->name] as $controller){
                 $this->panelControllers[] = $controller;
             }
         }
-        if(Yii::$app->params['panelWidget'][Yii::$app->controller->module->id][$this->name]??false){
-            foreach (Yii::$app->params['panelWidget'][Yii::$app->controller->module->id][$this->name] as $controller){
+        $module = $leadingController->module;
+        if($module->panels[$this->name]??false){
+            foreach ($module->panels[$this->name] as $controller){
+                $this->panelControllers[] = $controller;
+            }
+        }
+        if(Yii::$app->params['panelWidget'][$module->id][$this->name]??false){
+            foreach (Yii::$app->params['panelWidget'][$module->id][$this->name] as $controller){
                 $this->panelControllers[] = $controller;
             }
         }

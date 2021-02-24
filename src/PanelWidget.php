@@ -23,13 +23,13 @@ class PanelWidget extends Widget
         parent::init();
 
         $leadingController = Yii::$app->controller;
-        if(isset($leadingController->panels) && $leadingController->panels[$this->name]??false){
+        if(isset($leadingController->panels) && ($leadingController->panels[$this->name]??false)){
             foreach ($leadingController->panels[$this->name] as $controller){
                 $this->panelControllers[] = $controller;
             }
         }
         $module = $leadingController->module;
-        if($module->panels[$this->name]??false){
+        if(isset($module->panels) &&  ($module->panels[$this->name]??false)){
             foreach ($module->panels[$this->name] as $controller){
                 $this->panelControllers[] = $controller;
             }

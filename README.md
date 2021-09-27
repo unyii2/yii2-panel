@@ -103,6 +103,13 @@ Optionally, if no possible add to module parameter 'panels', panel routes can de
             'last' =>  [
                 [
                     'route' => 'delivery/panel/transit-declarations',
+                    /**  
+                     * parameters for action method:
+                     * public function actionMyTransitDeclarations(array $statusIdList): string 
+                     */
+                    'params' => [
+                        'statusIdList' => [5, 20]
+                    ]                    
                 ]
             ],
         ]

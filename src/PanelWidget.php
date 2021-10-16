@@ -7,6 +7,7 @@ namespace unyii2\yii2panel;
 use Exception;
 use Yii;
 use yii\base\Widget;
+use yii\helpers\Html;
 use yii\web\ForbiddenHttpException;
 
 class PanelWidget extends Widget
@@ -64,7 +65,13 @@ class PanelWidget extends Widget
                 $configParams[$paramName] = $paramValue;
             }
             try {
-                $result .= Yii::$app->runAction($route, $configParams);
+                if (!$panel = Yii::$app->runAction($route, $configParams)) {
+                    continue;
+                }
+                if (isset($panelController['tag'])) {
+                    $panel = Html::tag($panelController['tag'], $panel, $panelController['options']??[]);
+                }
+                $result .= $panel;
             }catch (ForbiddenHttpException $e ){
                 Yii::$app->controller = $oldController;
                 //its ok - no access

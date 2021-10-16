@@ -68,8 +68,10 @@ To module add parameter 'panels' and in configuration for module add panels rout
                     [
                         'route' => 'd3accexport/invoice-panel/document-settings',
                         'params' => [
-                            'docId' => 13
+                            'docId' => 13 // action parameter value
                          ]
+                        'tag' => 'div', // optinal. Add enclosing tag to panel  
+                        'options' => ['class' => 'col-sm-8 col-md-6 col-lg-4'] //enclosing tag options
                      ]
                  ]
             ],

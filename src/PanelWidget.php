@@ -1,47 +1,21 @@
 <?php
 
-
 namespace unyii2\yii2panel;
 
-
 use Exception;
-use Yii;
 use yii\base\Widget;
 use yii\helpers\Html;
-use yii\web\ForbiddenHttpException;
 
 class PanelWidget extends Widget
 {
 
+    /** @var string panel name */
     public $name;
 
+    /** @var array controller action parameters */
     public $params = [];
 
-    public $panelControllers = [];
-
-    public function init()
-    {
-        parent::init();
-
-        $leadingController = Yii::$app->controller;
-        if(isset($leadingController->panels) && ($leadingController->panels[$this->name]??false)){
-            foreach ($leadingController->panels[$this->name] as $controller){
-                $this->panelControllers[] = $controller;
-            }
-        }
-        $module = $leadingController->module;
-        if(isset($module->panels) &&  ($module->panels[$this->name]??false)){
-            foreach ($module->panels[$this->name] as $controller){
-                $this->panelControllers[] = $controller;
-            }
-        }
-        if(Yii::$app->params['panelWidget'][$module->id][$this->name]??false){
-            foreach (Yii::$app->params['panelWidget'][$module->id][$this->name] as $controller){
-                $this->panelControllers[] = $controller;
-            }
-        }
-    }
-
+    public $panelControllers;
 
     /**
      * @return string
@@ -49,37 +23,33 @@ class PanelWidget extends Widget
      */
     public function run()
     {
-        if(!$this->panelControllers){
+
+        $logic = new PanelLogic([
+            'params' => $this->params,
+            'name' => $this->name,
+            'panelControllers' => $this->panelControllers
+        ]);
+
+        if (!$panelControllers = $logic->run()) {
             return '';
         }
+
         /**
          * on exception no rolled back to main controller
          */
-        $oldController = Yii::$app->controller;
         $result = '';
-        foreach ($this->panelControllers as $panelController) {
-            $route = $panelController['route'];
-
-            $configParams = $panelController['params'] ?? [];
-            foreach ($this->params as $paramName => $paramValue) {
-                $configParams[$paramName] = $paramValue;
+        foreach ($panelControllers as $panelController) {
+            $panelResult = $panelController['result'] ?? '';
+            if (!$panelResult) {
+                continue;
             }
-            try {
-                if (!$panel = Yii::$app->runAction($route, $configParams)) {
-                    continue;
-                }
-                if (isset($panelController['tag'])) {
-                    $panel = Html::tag($panelController['tag'], $panel, $panelController['options']??[]);
-                }
-                $result .= $panel;
-            }catch (ForbiddenHttpException $e ){
-                Yii::$app->controller = $oldController;
-                //its ok - no access
-            }catch (Exception $exception){
-                Yii::$app->controller = $oldController;
-                throw $exception;
+            $panel = $panelResult;
+            if (isset($panelController['tag'])) {
+                $panel = Html::tag($panelController['tag'], $panel, $panelController['options'] ?? []);
             }
+            $result .= $panel;
         }
         return $result;
     }
+
 }

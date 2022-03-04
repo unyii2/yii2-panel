@@ -9,6 +9,8 @@ Meeting better as expected, as the Yii2Panel can be used for displaying panel fr
 
 Another benefit is that the panels to be displayed are assigned to a module configuration that allows different panels to be used in the module for different projects.
 
+For procesing submited data from PanelWidgwet van use PanleLogic
+
 Realisation
 -----------
 Simply dashboard solution. Each dashboard panel define as panel controller action  identically as Yii page:
@@ -56,6 +58,31 @@ echo \unyii2\yii2panel\PanelWidget::widget([
 
 ```
 
+# Controller action 
+For processing submited data form panel widget can use PanelLogic
+```php
+    public function actionCreate()
+    {
+    
+        $model = new RkInvoiceForm();
+        if($model->load($request->post()) && $model->save()) {
+            $panelLogic = Yii::createObject([
+                'class' => PanelLogic::class,
+                'name' => 'LietvedibaRkInvoiceSave',
+                'params' => [
+                    'modelRecordId' => $model->id
+                ]
+            ]);
+            $panelLogic->run();
+            return $this->redirect(['view', 'id' => $model->id]);
+        }
+        return $this->render('create', [
+            'model' => $model,
+        ]);
+       
+    }
+```
+
 # Module config
 
 To module add parameter 'panels' and in configuration for module add panels routes
@@ -63,8 +90,8 @@ To module add parameter 'panels' and in configuration for module add panels rout
         'invoices' => [
             'class' => 'd3modules\d3invoices\Module',
             'panels' => [
-                'exportSettings' =>
-                [
+                /** for widget */
+                'exportSettings' => [
                     [
                         'route' => 'd3accexport/invoice-panel/document-settings',
                         'params' => [
@@ -73,7 +100,13 @@ To module add parameter 'panels' and in configuration for module add panels rout
                         'tag' => 'div', // optinal. Add enclosing tag to panel  
                         'options' => ['class' => 'col-sm-8 col-md-6 col-lg-4'] //enclosing tag options
                      ]
-                 ]
+                 ],
+                 /** for panel logic */
+                 'LietvedibaRkInvoiceSave' => [
+                    [
+                        'route' => 'deal/panel/save'
+                    ]
+                ],
             ],
         ],
 
@@ -181,16 +214,40 @@ class InvoicePanelController extends Controller
         ];
     }
 
+    /** for widget */
     public function actionDocumentSettings()
     {
         return $this->render('setting_grid',[]);
 
     }
 
+    /** for widget */
     public function actionMessage()
     {
         return $this->render('message',[]);
 
+    }
+
+    /** for controller logic */
+    public function actionSave(int $modelRecordId): bool
+    {
+        if (!$model = DealInvoice::findOne(['invoice_id' => $modelRecordId])) {
+            $model = new DealInvoice();
+            $model->invoice_id = $modelRecordId;
+        }
+
+        $request = Yii::$app->request;
+        if ($model->load($request->post())
+            && $model->deal_id
+            && $model->save()
+        ) {
+            return true;
+        }
+
+        if ($model->hasErrors()) {
+            throw new \Exception(json_encode($model->getErrors()));
+        }
+        return true;
     }
 
 }

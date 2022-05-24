@@ -13,9 +13,6 @@
             "homepage": "http://www.weberp.lv/"
         }
     ],
-    "require": {
-        "php": "7.*"
-    },
     "autoload": {
         "psr-4": {
             "unyii2\\yii2panel\\": "src/"

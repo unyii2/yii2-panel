@@ -9,16 +9,19 @@ use yii\helpers\Html;
 class PanelWidget extends Widget
 {
 
-    /** @var string panel name */
-    public $name;
+    /** @var string|null panel name */
+    public ?string $name = null;
 
     /** @var array controller action parameters */
-    public $params = [];
+    public array $params = [];
 
-    public $panelControllers;
+    public array $panelControllers = [];
+
+    /** @var bool for getting data panel can use for collecting data */
+    public bool $returnArray = false;
 
     /**
-     * @return string
+     * @return string|array
      * @throws Exception
      */
     public function run()
@@ -38,9 +41,14 @@ class PanelWidget extends Widget
          * on exception no rolled back to main controller
          */
         $result = '';
+        $resultArray = [];
         foreach ($panelControllers as $panelController) {
             $panelResult = $panelController['result'] ?? '';
             if (!$panelResult) {
+                continue;
+            }
+            if ($this->returnArray) {
+                $resultArray[] = $panelResult;
                 continue;
             }
             $panel = $panelResult;
@@ -49,7 +57,9 @@ class PanelWidget extends Widget
             }
             $result .= $panel;
         }
+        if ($resultArray) {
+            return $resultArray;
+        }
         return $result;
     }
-
 }

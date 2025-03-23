@@ -17,11 +17,9 @@ class PanelWidget extends Widget
 
     public array $panelControllers = [];
 
-    /** @var bool for getting data panel can use for collecting data */
-    public bool $returnArray = false;
 
     /**
-     * @return string|array
+     * @return string
      * @throws Exception
      */
     public function run()
@@ -41,14 +39,9 @@ class PanelWidget extends Widget
          * on exception no rolled back to main controller
          */
         $result = '';
-        $resultArray = [];
         foreach ($panelControllers as $panelController) {
             $panelResult = $panelController['result'] ?? '';
             if (!$panelResult) {
-                continue;
-            }
-            if ($this->returnArray) {
-                $resultArray[] = $panelResult;
                 continue;
             }
             $panel = $panelResult;
@@ -56,9 +49,6 @@ class PanelWidget extends Widget
                 $panel = Html::tag($panelController['tag'], $panel, $panelController['options'] ?? []);
             }
             $result .= $panel;
-        }
-        if ($resultArray) {
-            return $resultArray;
         }
         return $result;
     }

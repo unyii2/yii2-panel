@@ -5,6 +5,7 @@ namespace unyii2\yii2panel;
 use Exception;
 use Yii;
 use yii\base\Component;
+use yii\base\InvalidRouteException;
 use yii\web\ForbiddenHttpException;
 
 /**
@@ -14,19 +15,29 @@ class PanelLogic extends Component
 {
 
     /** @var array controller action parameters */
-    public $params = [];
+    public array $params = [];
 
-    /** @var string panel name */
-    public $name;
+    /** @var string|null panel name */
+    public ?string $name = null;
 
-    public $panelControllers = [];
+    public array $panelControllers = [];
 
+    public bool $loadPanelControllers = true;
+
+    /**
+     * @throws \yii\console\Exception
+     * @throws InvalidRouteException
+     */
     public function run(): array
     {
         if (!$this->panelControllers) {
             $this->panelControllers = [];
         }
-        $panelControllers = $this->loadPanelControllers();
+        if ($this->loadPanelControllers) {
+            $panelControllers = $this->loadPanelControllers();
+        } else {
+            $panelControllers = $this->panelControllers;
+        }
         if (!$panelControllers) {
             return [];
         }
@@ -46,7 +57,7 @@ class PanelLogic extends Component
                 $panelControllers[$key]['result'] = Yii::$app->runAction($route, $configParams);
             } catch (ForbiddenHttpException $e) {
                 Yii::$app->controller = $oldController;
-                //its ok - no access
+                //It`s ok - no access
             } catch (Exception $exception) {
                 Yii::$app->controller = $oldController;
                 throw $exception;
@@ -54,7 +65,6 @@ class PanelLogic extends Component
         }
         Yii::$app->controller = $oldController;
         return $panelControllers;
-
     }
 
     /**

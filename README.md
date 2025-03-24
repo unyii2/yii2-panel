@@ -252,3 +252,138 @@ class InvoicePanelController extends Controller
 
 }
 ```
+# panel usage as data transfering between modules
+
+## to module panels add panel action
+```php
+$config = [
+    'modules' => [
+        'invoices' => [
+            'class' => 'd3modules\d3invoices\Module',
+            'panels' => [
+                'invoice-items-woff' => [
+                    [
+                        'route' => 'd4storei/data-panel/woff',
+                    ]
+            ]         
+        ]
+    ]
+
+```
+
+## executing panel
+Can use for getting data or executing something in other module
+```php
+
+            $panelLogic = new PanelLogic([
+                'name' => 'invoice-items-woff',
+                'params' => [
+                    'invoiceSysModelId' => $sysModelId,
+                    'invoiceId' => $model->id,
+                    'items' => $items,
+                ],
+            ]);
+            $panelLogicData = $logic->run();
+
+
+```
+
+## panel controller
+```php
+use unyii2\yii2panel\Controller;
+
+/**
+ * @property Module $module
+ */
+class DataPanelController extends Controller
+{
+
+    public function behaviors(): array
+    {
+        return [
+            'access' => [
+                'class' => AccessControl::class,
+                'rules' => [
+                    /**
+                     * standard definition
+                     */
+                    [
+                        'allow' => true,
+                        'actions' => [
+                            'woff',
+                        ],
+                        'roles' => [
+                            D3ModulesD4StoreiFullUserRole::NAME,
+                        ],
+                    ],
+                ],
+            ],
+        ];
+    }
+
+            /**
+             * masīvs pielāgots InvInvoiceItems::load()
+             */
+            $list[] = [
+                'name' => $row->storeProduct->product->name,
+                'count' => $row->productQnt,
+        }
+        return $list;
+    }
+
+    /**
+     *  write off invoice items
+     *  Add refs:
+     *  - inv_invoice
+     *  - inv_invoice_items
+     *  - user
+     *
+     * @param int $invoiceSysModelId
+     * @param int $invoiceId
+     * @param array<int, array{
+     *     itemSysModelId: int,
+     *     itemId: int,
+     *     count:float,
+     *     unitId: int,
+     *     storeProductSysModelId: int,
+     *     storeProductId: int
+     * }> $items
+     * @return bool
+     * @throws D3ActiveRecordException
+     * @throws Exception
+     */
+    public function actionWoff(
+        int $invoiceSysModelId,
+        int $invoiceId,
+        array $items
+    ): bool
+    {
+        $storeProductSysModelId = SysModelsDictionary::getIdByClassName(D4StoreStoreProduct::class);
+        if (!$transaction = Yii::$app->db->beginTransaction()) {
+            throw new Exception('Can not initiate transaction');
+        }
+        try {
+            foreach ($items as $item) {
+                if ((int)$item['storeProductSysModelId'] !== $storeProductSysModelId) {
+                    throw new Exception('Wrong store product model sys id: ' . $storeProductSysModelId);
+                }
+                $product = D4StoreStoreProduct::findOne($item['storeProductId']);
+                $action = new Action($product);
+                $action->outSys($item['count'],  $item['itemSysModelId'], $item['itemId']);
+                $action->addRef(Yii::$app->user);
+                $action->addRefSys($invoiceSysModelId, $invoiceId);
+            }
+            $transaction->commit();
+        } catch (\Exception $e) {
+            $transaction->rollBack();
+            FlashHelper::addDanger($e->getMessage());
+            Yii::error($e->getMessage() . PHP_EOL . $e->getTraceAsString());
+            return false;
+        }
+        return true;
+    }
+}
+
+
+```
+

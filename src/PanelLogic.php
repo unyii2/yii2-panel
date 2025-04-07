@@ -51,7 +51,11 @@ class PanelLogic extends Component
 
             $configParams = $panelController['params'] ?? [];
             foreach ($this->params as $paramName => $paramValue) {
-                $configParams[$paramName] = $paramValue;
+                if (isset($configParams[$paramName]) && is_array($paramValue)) {
+                    $configParams[$paramName] = array_merge($configParams[$paramName], $paramValue);
+                } else {
+                    $configParams[$paramName] = $paramValue;
+                }
             }
             try {
                 $panelControllers[$key]['result'] = Yii::$app->runAction($route, $configParams);

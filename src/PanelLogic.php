@@ -2,10 +2,11 @@
 
 namespace unyii2\yii2panel;
 
-use Exception;
+use Throwable;
 use Yii;
 use yii\base\Component;
 use yii\base\InvalidRouteException;
+use yii\helpers\VarDumper;
 use yii\web\ForbiddenHttpException;
 
 /**
@@ -62,9 +63,18 @@ class PanelLogic extends Component
             } catch (ForbiddenHttpException $e) {
                 Yii::$app->controller = $oldController;
                 //It`s ok - no access
-            } catch (Exception $exception) {
+            } catch (Throwable $e) {
+                $panelControllers[$key]['result'] = 'Panel error: ' . $e->getMessage()
+                    . '; route: "' . VarDumper::dumpAsString($route) . '"';
+                Yii::error([
+                    'msg' => 'Panel error!',
+                    'exception' => $e,
+                    'context' => [
+                        'route' => $route,
+                        'params' => $configParams
+                    ]
+                ]);
                 Yii::$app->controller = $oldController;
-                throw $exception;
             }
         }
         Yii::$app->controller = $oldController;

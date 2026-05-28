@@ -10,7 +10,11 @@ class Controller extends \yii\web\Controller
 
     public function render($view, $params = [])
     {
-        return $this->getView()->render($view, $params, $this);
+        $filePath = $this->getViewPath() . DIRECTORY_SEPARATOR . $view;
+        if (pathinfo($filePath, PATHINFO_EXTENSION) === '') {
+            $filePath .=  '.php';
+        }
+        return $this->renderFile($filePath, $params);
     }
 
 //    public function getViewPath()

@@ -10,13 +10,14 @@ class Controller extends \yii\web\Controller
 
     public function render($view, $params = []): string
     {
-        $filePath = $this->getViewPath() . DIRECTORY_SEPARATOR . $view;
+        if (strpos($view,'@') === 0) {
+            $filePath = Yii::getAlias($view);
+        } else {
+            $filePath = $this->getViewPath() . DIRECTORY_SEPARATOR . $view;
+        }
         if (pathinfo($filePath, PATHINFO_EXTENSION) === '') {
             $filePath .=  '.php';
         }
-        if (strpos($filePath,'@') === 0) {
-            $filePath = Yii::getAlias($filePath);
-        }
-        return $this->renderFile($filePath, $params);
+        return $this->view->renderPhpFile($filePath, $params);
     }
 }
